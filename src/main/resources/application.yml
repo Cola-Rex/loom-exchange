@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: loom-exchange
+  
+  profiles:
+    active: development
+
+---
+# 开发环境配置
+spring:
+  config:
+    activate:
+      on-profile: development
+      
+logging:
+  level:
+    com.loom.exchange: DEBUG
+    org.springframework: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+---
+# 生产环境配置
+spring:
+  config:
+    activate:
+      on-profile: production
+
+logging:
+  level:
+    com.loom.exchange: INFO
+    org.springframework: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/loom-exchange.log
+    max-size: 100MB
+    max-history: 30
+
+# 应用配置
+loom-exchange:
+  matching-engine:
+    # 撮合引擎配置
+    virtual-thread-pool-size: 1000
+    order-queue-capacity: 100000
+    
+  performance:
+    # 性能监控配置
+    stats-interval: 10s
+    latency-percentiles: [50, 95, 99, 99.9]
+    
+  trading:
+    # 交易配置
+    symbols:
+      - BTCUSDT
+      - ETHUSDT
+      - ADAUSDT
+    
+    # 风控参数
+    max-order-size: 1000
+    max-orders-per-user: 100
+    price-deviation-limit: 0.1  # 10%
+
+# JVM和性能相关配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true

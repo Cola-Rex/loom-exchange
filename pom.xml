@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.loom</groupId>
+    <artifactId>loom-exchange</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>Loom Exchange</name>
+    <description>High-frequency trading matching engine using JDK 21 Virtual Threads and ZGC</description>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <!-- JDK 21 Features -->
+        <jdk.preview.features>true</jdk.preview.features>
+        
+        <!-- Dependencies -->
+        <spring.boot.version>3.2.0</spring.boot.version>
+        <jackson.version>2.15.2</jackson.version>
+        <netty.version>4.1.100.Final</netty.version>
+        <chronicle.map.version>3.24.4</chronicle.map.version>
+        <disruptor.version>4.0.0</disruptor.version>
+        <junit.version>5.10.0</junit.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot for DI and configuration -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        
+        <!-- Netty for high-performance networking -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        
+        <!-- Chronicle Map for ultra-low latency data structures -->
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>chronicle-map</artifactId>
+            <version>${chronicle.map.version}</version>
+        </dependency>
+        
+        <!-- LMAX Disruptor for lock-free ring buffer -->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>${disruptor.version}</version>
+        </dependency>
+        
+        <!-- Jackson for JSON processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- JVM Arguments for optimal performance -->
+    <profiles>
+        <profile>
+            <id>production</id>
+            <properties>
+                <jvm.args>
+                    -XX:+UnlockExperimentalVMOptions
+                    -XX:+UseZGC
+                    -XX:+UseGenerationalZGC
+                    -XX:+UseTransparentHugePages
+                    -XX:+UseLargePages
+                    -Xmx8g
+                    -Xms8g
+                    -XX:SoftMaxHeapSize=7g
+                    --enable-preview
+                </jvm.args>
+            </properties>
+        </profile>
+    </profiles>
+</project>
